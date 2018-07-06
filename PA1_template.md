@@ -1,6 +1,6 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
-author: Julien Nabonne
+author: jnabonne
 output: 
   html_document: 
     keep_md: yes
@@ -98,7 +98,7 @@ legend(x=210, y=180, legend=c("mean","max"), col=c("blue","red"), lty=c(3,1))
 
 ![](PA1_template_files/figure-html/time_series_plot-1.png)<!-- -->
 
-Following is the index and value of the 5-minute interval containing the maximum
+Following is the **index** and **value** of the 5-minute interval containing the maximum
 number of steps (on average across all the days in the dataset):  
 
 ```r
@@ -166,13 +166,21 @@ summary(mdata2)
 Checking that even if totals changed a bit, the plot global shape **has not**
 
 ```r
-# recomputing first step and displaying the plot
+# recomputing first step with new data set
 steps_day2 <- mdata2 %>% group_by(date) %>% summarize(sumSteps=sum(steps))
-hist(steps_day2$sumSteps,
-     main="updated histogram of steps taken each day",
-     xlab="sum of steps per day")
-# optionnaly printing (again) that should be identical)
+# plotting the two plots side by side for easier comparison
+par(mfrow=c(1,2))
+hist(steps_day$sumSteps,
+     main="original histo",
+     xlab="steps per day")
+# optionnaly printing (again) the mean (should be equal)
 abline(v=mean(steps_day$sumSteps, na.rm=T), lty=3, col="blue")
+legend("topright", legend="mean", col="blue", lty=3)
+# the original plotting
+hist(steps_day2$sumSteps,
+     main="updated histogram (NA imputted)",
+     xlab="steps per day")
+abline(v=mean(steps_day2$sumSteps, na.rm=T), lty=3, col="blue")
 legend("topright", legend="mean", col="blue", lty=3)
 ```
 
