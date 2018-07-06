@@ -86,27 +86,27 @@ Using dplyr again but grouping by intervals, we build the required plot
 steps_interval_avg <- mdata %>%
     group_by(interval) %>%
     summarize(meanSteps=mean(steps, na.rm=T))
-plot(steps_interval_avg$meanSteps, type='l',
+plot(steps_interval_avg, type='l',
      main="daily average steps per 5min interval",
-     xlab="interval index",
+     xlab="5min interval",
      ylab="average steps")
 # optionnaly printing the max and average values as lines
 abline(h=mean(steps_interval_avg$meanSteps, na.rm=T), lty=3, col="blue")
 abline(h=max(steps_interval_avg$meanSteps), lty=1, col="red")
-legend(x=210, y=180, legend=c("mean","max"), col=c("blue","red"), lty=c(3,1))
+legend(x=1800, y=180, legend=c("mean","max"), col=c("blue","red"), lty=c(3,1))
 ```
 
 ![](PA1_template_files/figure-html/time_series_plot-1.png)<!-- -->
 
-Following is the **index** and **value** of the 5-minute interval containing the maximum
-number of steps (on average across all the days in the dataset):  
+Following is the 5min **interval** with maximum steps and its **value**:   
 
 ```r
-which.max(steps_interval_avg$meanSteps)
+idx_max <- which.max(steps_interval_avg$meanSteps)
+steps_interval_avg$interval[idx_max]
 ```
 
 ```
-## [1] 104
+## [1] 835
 ```
 
 ```r
@@ -131,25 +131,27 @@ table(complete.cases(mdata))
 ##  2304 15264
 ```
 
-Creating new dataset `mdata2` with missing values imputed with interval average
-across all day (previsouly computed)
+Creating a new dataset `mdata2` with missing values for interval imputed with
+the corresponding interval average (previously computed).  
+_Example: we would imput 2012-10-01 25e interval missing steps count with the 
+average of steps for the 25e interval across all day_
 
 ```r
 mdata2 <- mdata
 # parsing dataset looking for missing values...
 for (i in 1:nrow(mdata2))
     if (is.na(mdata2$steps[i])) {
-        # retrieving interval index in steps_interval_steps_mean
+        # retrieving interval index in steps_interval_avg
         mean_interval_idx <- steps_interval_avg$interval == mdata2$interval[i]
         # imputting na by corresponding steps_interval_avg
         mdata2$steps[i] <- steps_interval_avg$meanSteps[mean_interval_idx]
     }
 ```
 
-Checking that imputed values **did not** impact dataset mean and median values
+Checking that imputed values **did not** impact dataset mean
 
 ```r
-# checking there is no more NA and that mean and median values did not change
+# checking there is no more NA and that mean did not change
 summary(mdata2)
 ```
 
@@ -171,7 +173,7 @@ steps_day2 <- mdata2 %>% group_by(date) %>% summarize(sumSteps=sum(steps))
 # plotting the two plots side by side for easier comparison
 par(mfrow=c(1,2))
 hist(steps_day$sumSteps,
-     main="original histo",
+     main="original histogram",
      xlab="steps per day")
 # optionnaly printing (again) the mean (should be equal)
 abline(v=mean(steps_day$sumSteps, na.rm=T), lty=3, col="blue")
